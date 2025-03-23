@@ -516,7 +516,8 @@ The Random Forest model does not effectively predict **purchase amount** based o
   - **Feature selection issues** (e.g., irrelevant or redundant features).
   - **Lack of enough meaningful data patterns** that the model can learn from.
 
-
+# General conclusion:
+After applying three different modeling methods to predict purchase amount, the results were not promising. Given the lack of strong predictive power, I have decided to take the main raw dataset into Power BI for visualization. This will allow me to analyze trends, uncover patterns, and make predictions based on historical records.
 
 
 
