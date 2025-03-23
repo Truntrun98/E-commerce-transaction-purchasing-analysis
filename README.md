@@ -352,7 +352,7 @@ I conducted an analysis using Purchase_Amount as the primary factor. By examinin
 | **Age**            | -0.003585 | Almost no correlation; age does not significantly impact purchase amount. |
 
 Unfortunately, the results showed very weak or no correlation, which was not in line with my expectations. Given this, I will now proceed to testing predictive models to explore whether machine learning can uncover hidden patterns in the data that simple correlation analysis could not detect.
-# Logistic Regression model
+# Logistic Regression model testing
 ```python
 # Define features (X) and target variable (y)
 X = df[[  
@@ -379,6 +379,95 @@ print(model.summary())
 ```
 Result:
 ![image](https://github.com/user-attachments/assets/99d4c1b9-9422-4a3b-b45e-a1f7e6d4dedb)
+# Interpreting the result
+## Model Fit & Significance  
+
+- **Pseudo R-squared**: 0.0001963 → This is very low, meaning the model explains almost none of the variability in `Purchase_Amount`.  
+- **Log-Likelihood**: -27720.  
+- **LLR p-value**: 0.6204 → A high p-value suggests that the overall model is not statistically significant.  
+
+## Coefficients & Statistical Significance  
+
+- The coefficients represent the **log-odds change** in the probability of `Purchase_Amount` increasing due to each variable.  
+- **Extremely large standard errors** (e.g., `6.29e+05`) indicate possible **multicollinearity** or **scaling issues**.  
+- **P-values of 1.000** for most predictors mean they are **not statistically significant**.  
+- Some payment methods (**Cash on Delivery, Credit Card, etc.**) have missing standard errors (`NaN`), indicating issues in the data or model specification.  
+
+## Key Findings  
+
+- **No strong predictors**: None of the independent variables significantly predict `Purchase_Amount`.  
+- **Age has a coefficient of 0.0001** with a high p-value (0.847), meaning it has **no meaningful effect**.  
+- **Large standard errors** suggest **data scaling issues** or **high correlation between predictors**.
+
+## Conclusion:
+The dataset did not perform well with the Logistic Regression model for predicting purchase amount based on the given factors. As a result, I have decided to move forward with testing the Linear Regression model to assess its suitability for this dataset.
+
+# Logistic Regression model testing
+```python
+# Define dependent variable (target)
+y = df["Purchase_Amount"]
+
+# Define independent variables (predictors)
+X = df[[
+    "Beauty", "Books", "Clothing", "Electronics", "Grocery", "Home & Kitchen",
+    "Sports", "Toys", "Cash on Delivery", "Credit Card", "Debit Card",
+    "Net Banking", "PayPal", "UPI", "Age"
+]]
+
+# Add a constant for the intercept
+X = sm.add_constant(X)
+
+# Split data into training (80%) and testing (20%)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Fit the OLS regression model
+model = sm.OLS(y_train, X_train).fit()
+
+# Print the summary
+print(model.summary())
+```
+Result:
+![image](https://github.com/user-attachments/assets/4da343b1-821e-4eae-93ff-3269bbaa05e7)
+# Interpreting the result
+# Model Fit & Significance
+
+- **R-squared: 0.000** → The model explains virtually none of the variance in `Purchase_Amount`, meaning that the independent variables do not effectively predict purchase amount.  
+- **Adj. R-squared: 0.000** → Adjusted for the number of predictors, the explanatory power remains insignificant.  
+- **F-statistic: 1.454** (p-value = **0.126**) → The overall model is not statistically significant, meaning the predictors collectively do not explain variations in purchase amount.  
+
+# Coefficients & Statistical Significance
+
+### Intercept (`const`):  
+- **393.0025** → The baseline purchase amount when all other variables are zero.  
+
+### Product Categories (Beauty, Books, Clothing, etc.):  
+- All have **positive coefficients**, suggesting that purchasing in these categories slightly increases total purchase amount.  
+- The coefficients range from **42.0158 (Electronics)** to **55.0438 (Clothing)**.  
+- All p-values (**<0.001**) indicate statistical significance.  
+
+### Payment Methods (Cash on Delivery, Credit Card, etc.):  
+- All payment methods have **positive coefficients**, implying that customers using these payment methods tend to spend slightly more.  
+- **Cash on Delivery (71.3612)** and **PayPal (69.1386)** have the highest positive impact.  
+- All p-values (**<0.001**) indicate statistical significance.  
+
+### Age:  
+- **Coefficient: -0.0747**, suggesting that age has almost no impact on purchase amount.  
+- **p-value = 0.427** → Not statistically significant.  
+
+# Key Findings
+
+- **Weak Model Performance**: The **R-squared value is 0**, meaning the model does not explain variations in purchase amount.  
+- **Statistically Significant Coefficients**: Many independent variables are statistically significant (**p < 0.001**), but their effect sizes are small.  
+- **Age Has No Impact**: The coefficient is close to zero and not statistically significant.  
+- **Multicollinearity Risk**: The **Condition Number (9.05e+16)** is extremely high, suggesting strong multicollinearity, which may affect coefficient estimates.  
+
+# Conclusion
+
+This linear regression model does not effectively predict `Purchase_Amount`, as indicated by the near-zero **R-squared**. While product categories and payment methods show statistical significance, their impact is minimal, and **multicollinearity is a major concern**. Further model tuning or alternative approaches may be necessary.
+
+
+
+
 
 
 
