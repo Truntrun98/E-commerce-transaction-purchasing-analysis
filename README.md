@@ -146,6 +146,22 @@ Result:
 At this step, I do not modify any existing values in the original dataset. Instead, I add new boolean columns (0 for False and 1 for True) to represent the features of the selected categorical columns.
 
 ## Numerize the "Country" columns
+At the beginning, I mentioned the supplemental dataset. Initially, I considered adding new boolean columns for each unique country, but this would result in too many columns, making the dataset harder to interpret. Instead, I decided to convert country names into their respective international codes. To achieve this, I used a CSV file from GitHub containing country codes and merged its "country-code" column with the original dataset, matching country names from the supplemental dataset with the "Country" column in the original dataset.
+```python
+# Merge df with country_code to add 'country-code' next to 'Country'
+df_merged = df.merge(country_code[['name', 'country-code']],
+                      left_on='Country',
+                      right_on='name',
+                      how='left')
+
+# Drop the redundant 'name' column from country_code
+df_merged.drop(columns=['name'], inplace=True)
+
+df = df_merged
+
+df.info()
+```
+Result:
 
 
 
