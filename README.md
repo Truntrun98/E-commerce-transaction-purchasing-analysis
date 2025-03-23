@@ -522,23 +522,36 @@ After applying three different modeling methods to predict purchase amount, the 
 # Power BI analysis
 At first glance, the distribution of Payment Method and Product Category based on Purchase Amount appears quite similar, making it difficult to extract meaningful insights from their differences.
 ![image](https://github.com/user-attachments/assets/d8a6d0ae-322a-4145-8ea2-931b1fb3e031)
-Fig 1: Purchase by payment method
+**Fig 1: Purchase by payment method**
 
 ![image](https://github.com/user-attachments/assets/7ba9c58c-2776-462d-8974-5cdd5f77de95)
-Fig 2: Purchase by category
+**Fig 2: Purchase by category**
+
 
 However, after segmenting customers into age ranges, I found that the majority of revenue comes from the 41–65 age group.
 ![image](https://github.com/user-attachments/assets/ce25716f-885f-4a95-8738-509ec4f545d8)
-Fig 3: Purchase by age range
+**Fig 3: Purchase by age range**
+
 
 Moreover, after diving deeper into the average order value by product category, I found that Books and Home & Kitchen generated the highest average revenue in 2025. Additionally, Home & Kitchen had the highest growth rate in average order value over the past three years.
 ![image](https://github.com/user-attachments/assets/e2ceb537-98e2-40db-a81a-94f94e44feb3)
-Fig 4: Average order value by category
+**Fig 4: Average order value by category**
 
-For the 41–65 age group, the Books category dominates and also has the fastest growth rate.
+
+For individuals aged 41–65, the Books category stands out as the leading preference, showcasing the fastest growth rate among all segments. Interestingly, Toys emerge as the second most appealing category for this demographic, maintaining steady growth in average order value over time.
 ![image](https://github.com/user-attachments/assets/5f3852f1-f747-4bed-a1b6-500b89458e87)
-Fig 5: Average order value by category in the group age of 41 - 65
+**Fig 5: Average order value by category in the group age of 41 - 65**
 
 
+For the 26–40 age group, most categories have shown no significant change over time, except for Sports, which has declined dramatically over the past three years.
+![image](https://github.com/user-attachments/assets/2e15089a-a996-48e3-9a34-2733060d83b1)
+**Fig 6: Average order value by category in the group age of 26 - 40**
 
+In contrast to the 26–40 age group, young consumers aged 18–25 show a growing trend in purchasing Sports, Clothing, Electronics, and Beauty products, while other categories have declined in average order value.
+![image](https://github.com/user-attachments/assets/2b024e74-df08-47b4-bc6c-a03e33c63041)
+**Fig 7: Average order value by category in the group age of 18 - 25**
+
+In the 65+ age group, the focus is primarily on purchasing Sports, Electronics, and Grocery products.
+![image](https://github.com/user-attachments/assets/1041cdfd-72db-48c6-b328-e1e841e60f1c)
+**Fig 8: Average order value by category in the group age of above 65**
 
