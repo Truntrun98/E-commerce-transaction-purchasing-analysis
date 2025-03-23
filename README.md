@@ -380,26 +380,26 @@ print(model.summary())
 Result:
 ![image](https://github.com/user-attachments/assets/99d4c1b9-9422-4a3b-b45e-a1f7e6d4dedb)
 # Interpreting the result
-## Model Fit & Significance  
+### Model Fit & Significance  
 
 - **Pseudo R-squared**: 0.0001963 → This is very low, meaning the model explains almost none of the variability in `Purchase_Amount`.  
 - **Log-Likelihood**: -27720.  
 - **LLR p-value**: 0.6204 → A high p-value suggests that the overall model is not statistically significant.  
 
-## Coefficients & Statistical Significance  
+### Coefficients & Statistical Significance  
 
 - The coefficients represent the **log-odds change** in the probability of `Purchase_Amount` increasing due to each variable.  
 - **Extremely large standard errors** (e.g., `6.29e+05`) indicate possible **multicollinearity** or **scaling issues**.  
 - **P-values of 1.000** for most predictors mean they are **not statistically significant**.  
 - Some payment methods (**Cash on Delivery, Credit Card, etc.**) have missing standard errors (`NaN`), indicating issues in the data or model specification.  
 
-## Key Findings  
+### Key Findings  
 
 - **No strong predictors**: None of the independent variables significantly predict `Purchase_Amount`.  
 - **Age has a coefficient of 0.0001** with a high p-value (0.847), meaning it has **no meaningful effect**.  
 - **Large standard errors** suggest **data scaling issues** or **high correlation between predictors**.
 
-## Conclusion:
+### Conclusion:
 The dataset did not perform well with the Logistic Regression model for predicting purchase amount based on the given factors. As a result, I have decided to move forward with testing the Linear Regression model to assess its suitability for this dataset.
 
 # Logistic Regression model testing
@@ -429,13 +429,13 @@ print(model.summary())
 Result:
 ![image](https://github.com/user-attachments/assets/4da343b1-821e-4eae-93ff-3269bbaa05e7)
 # Interpreting the result
-# Model Fit & Significance
+## Model Fit & Significance
 
 - **R-squared: 0.000** → The model explains virtually none of the variance in `Purchase_Amount`, meaning that the independent variables do not effectively predict purchase amount.  
 - **Adj. R-squared: 0.000** → Adjusted for the number of predictors, the explanatory power remains insignificant.  
 - **F-statistic: 1.454** (p-value = **0.126**) → The overall model is not statistically significant, meaning the predictors collectively do not explain variations in purchase amount.  
 
-# Coefficients & Statistical Significance
+## Coefficients & Statistical Significance
 
 ### Intercept (`const`):  
 - **393.0025** → The baseline purchase amount when all other variables are zero.  
@@ -454,16 +454,68 @@ Result:
 - **Coefficient: -0.0747**, suggesting that age has almost no impact on purchase amount.  
 - **p-value = 0.427** → Not statistically significant.  
 
-# Key Findings
+### Key Findings
 
 - **Weak Model Performance**: The **R-squared value is 0**, meaning the model does not explain variations in purchase amount.  
 - **Statistically Significant Coefficients**: Many independent variables are statistically significant (**p < 0.001**), but their effect sizes are small.  
 - **Age Has No Impact**: The coefficient is close to zero and not statistically significant.  
 - **Multicollinearity Risk**: The **Condition Number (9.05e+16)** is extremely high, suggesting strong multicollinearity, which may affect coefficient estimates.  
 
-# Conclusion
+### Conclusion
 
 This linear regression model does not effectively predict `Purchase_Amount`, as indicated by the near-zero **R-squared**. While product categories and payment methods show statistical significance, their impact is minimal, and **multicollinearity is a major concern**. Further model tuning or alternative approaches may be necessary.
+
+# Random Forest model testing
+```python
+# Split data into training (80%) and testing (20%)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Initialize Random Forest model
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Train the model
+rf.fit(X_train, y_train)
+
+# Predict on test set
+y_pred = rf.predict(X_test)
+
+# Evaluate performance
+print("Mean Absolute Error (MAE):", mean_absolute_error(y_test, y_pred))
+print("Mean Squared Error (MSE):", mean_squared_error(y_test, y_pred))
+print("R-squared (R²):", r2_score(y_test, y_pred))
+```
+Result:
+Mean Absolute Error (MAE): 0.5004856277687583
+Mean Squared Error (MSE): 0.2676863389512165
+R-squared (R²): -0.07093765336990554
+
+# Interpreting the result:
+## Model Performance Metrics (Random Forest)
+
+### 1. Mean Absolute Error (MAE): **0.5005**
+- On average, the model’s predictions deviate by **0.5005 units** from the actual **purchase amount**.
+- A lower MAE indicates better accuracy in predicting **purchase amount**, but this value suggests the model may not be very precise.
+
+### 2. Mean Squared Error (MSE): **0.2677**
+- MSE measures the average squared difference between actual and predicted **purchase amounts**.
+- Since errors are squared, larger mistakes have a greater impact.
+- A lower MSE is preferred, but this value suggests that the model is struggling to predict **purchase amount** accurately.
+
+### 3. R-squared (R²): **-0.0709**
+- **This is a major concern.** A negative R² means the model performs **worse than simply predicting the average purchase amount for every observation**.
+- Ideally, R² should be close to **1** (which means a strong ability to explain variations in **purchase amount**).
+- A negative R² suggests that the **Random Forest model does not effectively capture patterns in purchase amount based on the given features**.
+### Conclusion
+
+The Random Forest model does not effectively predict **purchase amount** based on the given features. Key takeaways:
+
+- The **negative R² (-0.0709)** indicates that the model performs **worse than a simple average-based prediction**, meaning it fails to capture meaningful patterns in the data.
+- The **MAE (0.5005) and MSE (0.2677)** suggest that predictions are not very precise, with significant errors.
+- Despite Random Forest being a powerful algorithm, its poor performance here may be due to:
+  - **Weak relationships between features and purchase amount**.
+  - **Feature selection issues** (e.g., irrelevant or redundant features).
+  - **Lack of enough meaningful data patterns** that the model can learn from.
+
 
 
 
