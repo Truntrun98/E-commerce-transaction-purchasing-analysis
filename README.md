@@ -519,7 +519,25 @@ The Random Forest model does not effectively predict **purchase amount** based o
 # General conclusion:
 After applying three different modeling methods to predict purchase amount, the results were not promising. Given the lack of strong predictive power, I have decided to take the main raw dataset into Power BI for visualization. This will allow me to analyze trends, uncover patterns, and make predictions based on historical records.
 
+# Power BI analysis
+At first glance, the distribution of Payment Method and Product Category based on Purchase Amount appears quite similar, making it difficult to extract meaningful insights from their differences.
+![image](https://github.com/user-attachments/assets/d8a6d0ae-322a-4145-8ea2-931b1fb3e031)
+Fig 1: Purchase by payment method
 
+![image](https://github.com/user-attachments/assets/7ba9c58c-2776-462d-8974-5cdd5f77de95)
+Fig 2: Purchase by category
+
+However, after segmenting customers into age ranges, I found that the majority of revenue comes from the 41–65 age group.
+![image](https://github.com/user-attachments/assets/ce25716f-885f-4a95-8738-509ec4f545d8)
+Fig 3: Purchase by age range
+
+Moreover, after diving deeper into the average order value by product category, I found that Books and Home & Kitchen generated the highest average revenue in 2025. Additionally, Home & Kitchen had the highest growth rate in average order value over the past three years.
+![image](https://github.com/user-attachments/assets/e2ceb537-98e2-40db-a81a-94f94e44feb3)
+Fig 4: Average order value by category
+
+For the 41–65 age group, the Books category dominates and also has the fastest growth rate.
+![image](https://github.com/user-attachments/assets/5f3852f1-f747-4bed-a1b6-500b89458e87)
+Fig 5: Average order value by category in the group age of 41 - 65
 
 
 
