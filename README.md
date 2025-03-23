@@ -162,6 +162,223 @@ df = df_merged
 df.info()
 ```
 Result:
+RangeIndex: 50000 entries, 0 to 49999
+Data columns (total 23 columns):
+| #  | Column            | Non-Null Count | Dtype   |
+|----|------------------|--------------|--------|
+| 0  | Transaction_ID    | 50000 non-null | int64  |
+| 1  | User_Name         | 50000 non-null | object |
+| 2  | Age               | 50000 non-null | int64  |
+| 3  | Country           | 50000 non-null | object |
+| 4  | Product_Category  | 50000 non-null | object |
+| 5  | Purchase_Amount   | 50000 non-null | float64 |
+| 6  | Payment_Method    | 50000 non-null | object |
+| 7  | Transaction_Date  | 50000 non-null | object |
+| 8  | Beauty            | 50000 non-null | int64  |
+| 9  | Books             | 50000 non-null | int64  |
+| 10 | Clothing          | 50000 non-null | int64  |
+| 11 | Electronics       | 50000 non-null | int64  |
+| 12 | Grocery           | 50000 non-null | int64  |
+| 13 | Home & Kitchen    | 50000 non-null | int64  |
+| 14 | Sports            | 50000 non-null | int64  |
+| 15 | Toys              | 50000 non-null | int64  |
+| 16 | Cash on Delivery  | 50000 non-null | int64  |
+| 17 | Credit Card       | 50000 non-null | int64  |
+| 18 | Debit Card        | 50000 non-null | int64  |
+| 19 | Net Banking       | 50000 non-null | int64  |
+| 20 | PayPal            | 50000 non-null | int64  |
+| 21 | UPI               | 50000 non-null | int64  |
+| 22 | country-code      | 40070 non-null | float64 |
+
+I discovered that there are missing values in the country-code column. To address this issue, I need to identify which countries are missing and investigate the cause of this discrepancy. Once identified, I will take appropriate steps to fix the problem.
+```python
+# Display rows where "country-code" is null
+df_null_countries = df[df["country-code"].isna()]
+
+# Print unique countries
+df_null_countries["Country"].unique()
+```
+Result:
+array(['USA', 'UK'], dtype=object)
+
+It turns out that the missing values correspond to specific countries. This may be due to the main dataset using shortened country names. To verify this, I will check if these countries exist in the supplemental dataset by searching for values that contain "United States" or "United Kingdom."
+```python
+# Filter rows where the "name" column contains 'United States' or 'United Kingdom' (case-insensitive)
+df_missing_countries = country_code[country_code["name"].str.contains("United States|United Kingdom", case=False, na=False)]
+
+# Print the result
+df_missing_countries
+```
+Result: 
+| #   | Name                                           | Alpha-2 | Alpha-3 | Country Code | ISO 3166-2   | Region   | Sub-Region       | Intermediate Region | Region Code | Sub-Region Code | Intermediate Region Code |
+|-----|-----------------------------------------------|---------|---------|--------------|--------------|----------|------------------|---------------------|-------------|----------------|-------------------------|
+| 234 | United Kingdom of Great Britain and Northern Ireland | GB      | GBR     | 826          | ISO 3166-2:GB | Europe   | Northern Europe  | NaN                 | 150.0       | 154.0          | NaN                     |
+| 235 | United States of America                     | US      | USA     | 840          | ISO 3166-2:US | Americas | Northern America | NaN                 | 19.0        | 21.0           | NaN                     |
+| 236 | United States Minor Outlying Islands        | UM      | UMI     | 581          | ISO 3166-2:UM | Oceania  | Micronesia       | NaN                 | 9.0         | 57.0           | NaN                     |
+
+I identified the issue in the supplemental dataset, which caused a mismatch with the main dataset. To resolve this, I decided to correct the country names in the supplemental dataset and then rematch them with the main dataset.
+```python
+# Define the mapping of old names to new names
+country_name_fix = {
+    "United States of America": "USA",
+    "United Kingdom of Great Britain and Northern Ireland": "UK"
+}
+
+# Apply the changes to the "name" column
+country_code["name"] = country_code["name"].replace(country_name_fix)
+```
+Rematch
+```python
+# Merge df with country_code to add 'country-code' next to 'Country'
+df_merged = df.merge(country_code[['name', 'country-code']],
+                      left_on='Country',
+                      right_on='name',
+                      how='left',
+                      suffixes=('', '_new'))  # Add suffix to avoid conflicts
+
+# If "country-code_new" exists, replace the old "country-code" with it
+if "country-code_new" in df_merged.columns:
+    df_merged["country-code"] = df_merged["country-code_new"]
+    df_merged.drop(columns=["country-code_new"], inplace=True)  # Drop temporary column
+
+# Drop the redundant 'name' column from country_code
+df_merged.drop(columns=['name'], inplace=True)
+
+# Update df with the merged result
+df = df_merged
+
+# Display dataframe info
+df.info()
+```
+Result:
+RangeIndex: 50000 entries, 0 to 49999
+Data columns (total 23 columns):
+| #  | Column            | Non-Null Count | Dtype   |
+|----|------------------|---------------|--------|
+| 0  | Transaction_ID   | 50000 non-null | int64  |
+| 1  | User_Name        | 50000 non-null | object |
+| 2  | Age             | 50000 non-null | int64  |
+| 3  | Country         | 50000 non-null | object |
+| 4  | Product_Category | 50000 non-null | object |
+| 5  | Purchase_Amount  | 50000 non-null | float64 |
+| 6  | Payment_Method  | 50000 non-null | object |
+| 7  | Transaction_Date | 50000 non-null | object |
+| 8  | Beauty          | 50000 non-null | int64  |
+| 9  | Books           | 50000 non-null | int64  |
+| 10 | Clothing        | 50000 non-null | int64  |
+| 11 | Electronics     | 50000 non-null | int64  |
+| 12 | Grocery         | 50000 non-null | int64  |
+| 13 | Home & Kitchen  | 50000 non-null | int64  |
+| 14 | Sports         | 50000 non-null | int64  |
+| 15 | Toys           | 50000 non-null | int64  |
+| 16 | Cash on Delivery | 50000 non-null | int64  |
+| 17 | Credit Card     | 50000 non-null | int64  |
+| 18 | Debit Card      | 50000 non-null | int64  |
+| 19 | Net Banking     | 50000 non-null | int64  |
+| 20 | PayPal         | 50000 non-null | int64  |
+| 21 | UPI            | 50000 non-null | int64  |
+| 22 | country-code   | 50000 non-null | int64  |
+
+Finally, I have resolved the issue with missing values. Now, the dataset is fully prepared for further analysis. 🚀
+# Correlation table and map
+I selected all the numeric columns for analysis, excluding the country-code column. Although country-code is numerical, its values do not have a meaningful order or impact on correlations.
+## Metrix table
+```python
+ df[[
+    "Beauty", "Books", "Clothing", "Electronics", "Grocery", "Home & Kitchen",
+    "Sports", "Toys", "Cash on Delivery", "Credit Card", "Debit Card",
+    "Net Banking", "PayPal", "UPI", "Purchase_Amount", "Age"
+]].corr()
+```
+Result:
+|                     | Beauty   | Books    | Clothing | Electronics | Grocery  | Home & Kitchen | Sports   | Toys     | Cash on Delivery | Credit Card | Debit Card | Net Banking | PayPal   | UPI      | Purchase_Amount | Age      |
+|---------------------|---------|---------|---------|-------------|---------|--------------|---------|---------|-----------------|------------|-----------|------------|---------|---------|----------------|---------|
+| **Beauty**         | 1.000000 | -0.140601 | -0.140228 | -0.141460   | -0.140112 | -0.140035     | -0.141358 | -0.142381 | 0.002333         | -0.006852  | 0.002276   | -0.003003  | 0.005546 | -0.000319 | 0.000148        | -0.000986 |
+| **Books**          | -0.140601 | 1.000000 | -0.142556 | -0.143809   | -0.142439 | -0.142360     | -0.143705 | -0.144746 | -0.000606        | 0.004670   | 0.000830   | 0.000451   | -0.007614 | 0.002234  | 0.007520        | -0.004914 |
+| **Clothing**       | -0.140228 | -0.142556 | 1.000000 | -0.143428   | -0.142061 | -0.141983     | -0.143324 | -0.144362 | 0.003581         | -0.006254  | 0.000807   | 0.005161   | -0.000320 | -0.002941 | 0.008363        | -0.002966 |
+| **Electronics**    | -0.141460 | -0.143809 | -0.143428 | 1.000000   | -0.143310 | -0.143231     | -0.144584 | -0.145631 | -0.000974        | -0.005397  | -0.002432  | -0.003124  | 0.007978  | 0.003931  | -0.009662       | 0.005726  |
+| **Grocery**        | -0.140112 | -0.142439 | -0.142061 | -0.143310   | 1.000000 | -0.141865     | -0.143206 | -0.144242 | 0.003020         | 0.001477   | 0.004139   | 0.001962   | -0.002201 | -0.008351 | -0.000753       | 0.004043  |
+| **Home & Kitchen** | -0.140035 | -0.142360 | -0.141983 | -0.143231   | -0.141865 | 1.000000     | -0.143127 | -0.144163 | 0.001403         | 0.003106   | -0.005612  | 0.000320   | 0.004005  | -0.003180 | -0.003211       | -0.002887 |
+| **Sports**         | -0.141358 | -0.143705 | -0.143324 | -0.144584   | -0.143206 | -0.143127     | 1.000000 | -0.145525 | -0.010245        | 0.006624   | -0.003024  | -0.001447  | -0.004296 | 0.012336  | 0.004075        | -0.001552 |
+| **Toys**           | -0.142381 | -0.144746 | -0.144362 | -0.145631   | -0.144242 | -0.144163     | -0.145525 | 1.000000 | 0.001567         | 0.002518   | 0.003034   | -0.000318  | -0.003014 | -0.003783 | -0.006384       | 0.003466  |
+| **Cash on Delivery** | 0.002333  | -0.000606 | 0.003581  | -0.000974   | 0.003020  | 0.001403      | -0.010245 | 0.001567  | 1.000000         | -0.201109  | -0.201762  | -0.199132  | -0.200238 | -0.203528 | 0.006080        | -0.005431 |
+| **Credit Card**    | -0.006852 | 0.004670  | -0.006254 | -0.005397   | 0.001477  | 0.003106      | 0.006624  | 0.002518  | -0.201109        | 1.000000   | -0.199975  | -0.197369  | -0.198465  | -0.201726 | -0.005758       | -0.000274 |
+| **Debit Card**     | 0.002276  | 0.000830  | 0.000807  | -0.002432   | 0.004139  | -0.005612     | -0.003024 | 0.003034  | -0.201762        | -0.199975  | 1.000000   | -0.198009  | -0.199109  | -0.202380 | 0.005776        | -0.004817 |
+| **Net Banking**    | -0.003003 | 0.000451  | 0.005161  | -0.003124   | 0.001962  | 0.000320      | -0.001447 | -0.000318 | -0.199132        | -0.197369  | -0.198009  | 1.000000   | -0.196514  | -0.199743 | -0.009308       | 0.007910  |
+| **PayPal**         | 0.005546  | -0.007614 | -0.000320 | 0.007978    | -0.002201 | 0.004005      | -0.004296 | -0.003014 | -0.200238        | -0.198465  | -0.199109  | -0.196514  | 1.000000  | -0.200852 | 0.004223        | 0.000047  |
+| **UPI**            | -0.000319 | 0.002234  | -0.002941 | 0.003931    | -0.008351 | -0.003180     | 0.012336  | -0.003783 | -0.203528        | -0.201726  | -0.202380  | -0.199743  | -0.200852 | 1.000000  | -0.001103       | 0.002639  |
+| **Purchase_Amount** | 0.000148  | 0.007520  | 0.008363  | -0.009662   | -0.000753 | -0.003211     | 0.004075  | -0.006384 | 0.006080         | -0.005758  | 0.005776   | -0.009308  | 0.004223  | -0.001103 | 1.000000        | -0.003585 |
+| **Age**            | -0.000986 | -0.004914 | -0.002966 | 0.005726    | 0.004043  | -0.002887     | -0.001552 | 0.003466  | -0.005431        | -0.000274  | -0.004817  | 0.007910   | 0.000047  | 0.002639  | -0.003585       | 1.000000  |
+
+## Map
+```python
+# Select only the relevant numeric columns for correlation
+correlation_matrix = df[[
+    "Beauty", "Books", "Clothing", "Electronics", "Grocery", "Home & Kitchen",
+    "Sports", "Toys", "Cash on Delivery", "Credit Card", "Debit Card",
+    "Net Banking", "PayPal", "UPI", "Purchase_Amount", "Age"
+]].corr()
+
+# Set figure size
+plt.figure(figsize=(10, 8))
+
+# Draw heatmap with warm colors
+sns.heatmap(correlation_matrix, annot=True, cmap="coolwarm", fmt=".2f", linewidths=0.5, linecolor="gray")
+
+# Set title
+plt.title("Correlation Heatmap", fontsize=14)
+
+# Show the plot
+plt.show()
+```
+Result:
+![image](https://github.com/user-attachments/assets/7ac383b3-d4c2-41dc-9cd3-c2b4f5b79af2)
+
+I conducted an analysis using Purchase_Amount as the primary factor. By examining its correlations with other variables, I identified several insights. While most features showed weak correlations, there were slight positive associations with Clothing, Books, and Sports, suggesting that customers spending in these categories tend to have marginally higher purchase amounts. Conversely, Electronics and Toys exhibited weak negative correlations, indicating that purchases in these categories might slightly lower the total spending. Additionally, payment methods like Cash on Delivery and Debit Card showed a slight positive correlation with spending, whereas Credit Card and Net Banking had weak negative correlations. Overall, no single feature had a strong influence on Purchase_Amount, highlighting the need for further investigation into other potential factors affecting customer spending behavior.
+| **Feature**          | **Correlation with Purchase_Amount** | **Interpretation** |
+|----------------------|--------------------------------------|--------------------|
+| **Books**           | 0.007520  | Slight positive correlation; users buying books may spend slightly more. |
+| **Clothing**        | 0.008363  | Slight positive correlation; clothing purchases are associated with slightly higher spending. |
+| **Grocery**         | -0.000753 | Almost no correlation; grocery spending does not significantly impact total purchase amount. |
+| **Electronics**     | -0.009662 | Weak negative correlation; electronic purchases slightly lower total spending. |
+| **Sports**         | 0.004075  | Weak positive correlation; sports-related purchases slightly increase spending. |
+| **Toys**           | -0.006384 | Weak negative correlation; toy purchases slightly decrease total spending. |
+| **Cash on Delivery** | 0.006080  | Weak positive correlation; Cash on Delivery payments may be linked to slightly higher spending. |
+| **Credit Card**     | -0.005758 | Weak negative correlation; credit card users tend to spend slightly less. |
+| **Debit Card**      | 0.005776  | Weak positive correlation; debit card users may spend slightly more. |
+| **Net Banking**     | -0.009308 | Weak negative correlation; users paying via net banking may spend slightly less. |
+| **PayPal**         | 0.004223  | Weak positive correlation; PayPal payments are associated with slightly higher spending. |
+| **UPI**            | -0.001103 | No significant correlation. |
+| **Age**            | -0.003585 | Almost no correlation; age does not significantly impact purchase amount. |
+
+Unfortunately, the results showed very weak or no correlation, which was not in line with my expectations. Given this, I will now proceed to testing predictive models to explore whether machine learning can uncover hidden patterns in the data that simple correlation analysis could not detect.
+# Logistic Regression model
+```python
+# Define features (X) and target variable (y)
+X = df[[  
+    "Beauty", "Books", "Clothing", "Electronics", "Grocery", "Home & Kitchen",
+    "Sports", "Toys", "Cash on Delivery", "Credit Card", "Debit Card",
+    "Net Banking", "PayPal", "UPI", "Age"
+]]
+
+# Convert Purchase_Amount into a binary variable (above median = 1, below median = 0)
+y = (df["Purchase_Amount"] > df["Purchase_Amount"].median()).astype(int)
+
+# Split the data into 80% training and 20% testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Add a constant for the intercept in training and testing sets
+X_train = sm.add_constant(X_train)
+X_test = sm.add_constant(X_test)
+
+# Fit the logistic regression model using training data
+model = sm.Logit(y_train, X_train).fit()
+
+# Display the regression results
+print(model.summary())
+```
+Result:
+![image](https://github.com/user-attachments/assets/99d4c1b9-9422-4a3b-b45e-a1f7e6d4dedb)
 
 
 
