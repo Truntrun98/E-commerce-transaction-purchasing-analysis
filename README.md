@@ -1,7 +1,7 @@
 # 🛒 E-Commerce Transaction Purchasing Analysis
 
 ## 📌 Project Overview
-This project aims to analyze the impact of **product categories** and **payment methods** on **purchase amounts** in e-commerce transactions.  
+This project aims to analyze the impact of **product categories** and **payment methods**, **age** on **purchase amounts** in e-commerce transactions.  
 Using statistical analysis and machine learning models, I try to explore key factors influencing purchasing behavior.
 
 ## 🛠 Tools & Technologies Used
