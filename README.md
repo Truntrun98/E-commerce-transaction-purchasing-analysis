@@ -402,7 +402,7 @@ Result:
 ### Conclusion:
 The dataset did not perform well with the Logistic Regression model for predicting purchase amount based on the given factors. As a result, I have decided to move forward with testing the Linear Regression model to assess its suitability for this dataset.
 
-# Logistic Regression model testing
+# Linear Regression model testing
 ```python
 # Define dependent variable (target)
 y = df["Purchase_Amount"]
